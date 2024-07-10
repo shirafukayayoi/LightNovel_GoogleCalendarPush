@@ -11,7 +11,9 @@
    `pip install -r requirements.txt`をcmdで実行してください。
 1. `LightNovel_GoogleCalendarPush.py`のコードを自分の用途に合わせて変えていきます。
    1. `year`と`month`の変数を、ラノベの情報を取得したい年と月に合わせて変えてください。
-   1. 次に、`calendar_id`の変数に、自分がGoogleカレンダーの予定に入れたいカレンダーIDを入れます。[GoogleカレンダーIDの調べ方](https://qiita.com/mikeneko_t98/items/60e264941492d0b44fe5)←わからない人はこれを見てください。
+   1. 次に、`calendar_id`の変数に、自分がGoogleカレンダーの予定に入れたいカレンダーIDを入れます。
+   1. [GoogleカレンダーIDの調べ方](https://qiita.com/mikeneko_t98/items/60e264941492d0b44fe5)←わからない人はこれを見てください。
+   1. `target_media`に自動取得し、Googleカレンダーに入れたい出版社を""と,で入れます。
 1. GoogleAPIの取得
    1. apiの取得は、[[初心者向け] GoogleカレンダーにPythonから予定を追加・編集してみた](https://dev.classmethod.jp/articles/google-calendar-api-create-schedule/)  
    このサイトを参考にしてください。ダウンロードしたjsonファイルは`credentials.json`と名前を変更してこのプログラムと同じディレクトリに入れてください。

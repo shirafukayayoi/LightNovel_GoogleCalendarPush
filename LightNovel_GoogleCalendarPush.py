@@ -134,12 +134,6 @@ for page in range(1, 5):
                         'date': formatted_date,
                             'timeZone': 'Asia/Tokyo',
                         },
-                        'reminders': {
-                            'useDefault': False,
-                            'overrides': [
-                                {'method': 'popup', 'minutes': 30},
-                            ],
-                        },
                     }
 
                     event = service.events().insert(calendarId=calendar_id, body=event).execute()

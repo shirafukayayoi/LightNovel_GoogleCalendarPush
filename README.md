@@ -3,7 +3,7 @@
 ## 説明
 
 このpythonコードは、楽天ブックスの`https://books.rakuten.co.jp/calendar/001017/monthly/`のサイトから自動的にライトノベルのタイトル、発売日を取得し、Googleカレンダーに予定を追加するためのコードです。  
-7月上旬と書いてあるラノベは、その月の1日に追加されます。
+7月上旬と書いてあるラノベは、その月の1日に追加されます。  
 
 ## 使い方
 
@@ -21,6 +21,12 @@
    このコードを実行してください。  
    上手く行けば、こんな感じになるはずです。
    ![実行結果](image.png)
+
+## 追記
+
+LightNovel_Google-DiscordPush.pyを追加しました。  
+DIscordのWebhockを使って通知することができます。  
+webhookのURLは、[DiscordのWebhook URLの取得方法](https://qiita.com/mikeneko_t98/items/60e264941492d0b44fe5)を参考にしてください。
 
 ## 既存の問題
 

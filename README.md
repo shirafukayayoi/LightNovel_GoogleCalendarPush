@@ -27,6 +27,7 @@
 LightNovel_Google-DiscordPush.pyを追加しました。  
 DIscordのWebhockを使って通知することができます。  
 webhookのURLは、[DiscordのWebhook URLの取得方法](https://qiita.com/mikeneko_t98/items/60e264941492d0b44fe5)を参考にしてください。
+![discordNotifications](image-1.png)
 
 ## 既存の問題
 

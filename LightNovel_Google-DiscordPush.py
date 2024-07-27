@@ -9,19 +9,25 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlencode
 from datetime import datetime, date, timedelta
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Load environment variables from .env file
+load_dotenv('.env')
 
 # 指定する年と月
-year = 2024
-month = 7
+year = int(input("年を入力してください: "))
+month = int(input("月を入力してください: "))
 
 # 出力する出版社を指定
 target_media = ["電撃文庫", "講談社ラノベ文庫", "HJ文庫", "GA文庫", "ガガガ文庫", "ファンタジア文庫", "MF文庫J"]
 
 # カレンダーidを指定
-calendar_id = ''
+calendar_id = os.getenv("Calendar_ID")
 
 # DiscordのWebhook URLを指定
-discord_webhook_url = ''
+discord_webhook_url = os.getenv("discord_webhook")
 
 def send_to_discord(message):
     data = {
@@ -33,6 +39,9 @@ def send_to_discord(message):
     response = requests.post(discord_webhook_url, data=json.dumps(data), headers=headers)
     if response.status_code != 204:
         print(f"Discordへの送信に失敗しました。ステータスコード: {response.status_code}")
+
+# discordに通知を飛ばす
+send_to_discord("ライトノベルの情報をを取得します。")
 
 # GoogleCalendarの認証情報のロード
 creds = None
@@ -136,7 +145,6 @@ for page in range(1, 5):
 
             if check_duplicate(service, calendar_id, formatted_date, title):
                 print(f'{title} のイベントは既にカレンダーに存在します。')
-                send_to_discord(f'{title} のイベントは既にカレンダーに存在します。')
                 continue
 
             if any(target in media for target in target_media):
@@ -154,8 +162,6 @@ for page in range(1, 5):
 
                 event = service.events().insert(calendarId=calendar_id, body=event).execute()
                 print(f'{title} のイベントが追加されました。')
-                send_to_discord(f'{title} のイベントが追加されました。')
-
 
             else:
                 print(f"インデックス {i} が範囲外になったため終了します。")

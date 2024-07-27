@@ -13,9 +13,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Load environment variables from .env file
-load_dotenv('.env')
-
 # 指定する年と月
 year = int(input("年を入力してください: "))
 month = int(input("月を入力してください: "))
@@ -24,24 +21,26 @@ month = int(input("月を入力してください: "))
 target_media = ["電撃文庫", "講談社ラノベ文庫", "HJ文庫", "GA文庫", "ガガガ文庫", "ファンタジア文庫", "MF文庫J"]
 
 # カレンダーidを指定
-calendar_id = os.getenv("Calendar_ID")
+calendar_id = os.environ['GOOGLE_CALENDAR_ID']
 
-# DiscordのWebhook URLを指定
-discord_webhook_url = os.getenv("discord_webhook")
+# discordに通知するためのwebhook url
+webhook_url = os.environ['DISCORD_WEBHOOK_URL']
 
-def send_to_discord(message):
-    data = {
-        "content": message
-    }
+# Discordに通知する関数
+def send_discord_message(webhook_url, message):
     headers = {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json',
     }
-    response = requests.post(discord_webhook_url, data=json.dumps(data), headers=headers)
-    if response.status_code != 204:
-        print(f"Discordへの送信に失敗しました。ステータスコード: {response.status_code}")
+    data = {
+        'content': message,
+    }
+    response = requests.post(webhook_url, headers=headers, data=json.dumps(data))
+    response.raise_for_status()
 
-# discordに通知を飛ばす
-send_to_discord("ライトノベルの情報をを取得します。")
+    if response.status_code == 204:
+        print('Discordに通知しました。')
+    else:
+        print(f'通知に失敗しました。ステータスコード: {response.status_code}')
 
 # GoogleCalendarの認証情報のロード
 creds = None
@@ -128,40 +127,40 @@ for page in range(1, 5):
 
         media_items = html_soup.find_all(class_="item-title__media")
 
-    for i, title in enumerate(title_list):
-        if i < len(media_items):
-            media = media_items[i].get_text().strip()
-            formatted_date = convert_japanese_date(date_list[i], year)
+        for i, title in enumerate(title_list):
+            if i < len(media_items):
+                media = media_items[i].get_text().strip()
+                formatted_date = convert_japanese_date(date_list[i], year)
 
-            def check_duplicate(service, calendar_id, event_date, title):
-                time_min = (datetime.strptime(event_date, '%Y-%m-%d') + timedelta(days=-1)).strftime('%Y-%m-%d') + 'T00:00:00Z'
-                time_max = event_date + 'T00:00:00Z'
-                events = get_events(service, calendar_id, time_min, time_max)
-                
-                for event in events:
-                    if event['summary'] == title and 'date' in event['start']:
-                        return True
-                return False
+                def check_duplicate(service, calendar_id, event_date, title):
+                    time_min = (datetime.strptime(event_date, '%Y-%m-%d') + timedelta(days=-1)).strftime('%Y-%m-%d') + 'T00:00:00Z'
+                    time_max = event_date + 'T00:00:00Z'
+                    events = get_events(service, calendar_id, time_min, time_max)
+                    
+                    for event in events:
+                        if event['summary'] == title and 'date' in event['start']:
+                            return True
+                    return False
 
-            if check_duplicate(service, calendar_id, formatted_date, title):
-                print(f'{title} のイベントは既にカレンダーに存在します。')
-                continue
+                if check_duplicate(service, calendar_id, formatted_date, title):
+                    print(f'{title} のイベントは既にカレンダーに存在します。')
+                    continue
 
-            if any(target in media for target in target_media):
-                event = {
-                    'summary': title,
-                    'start': {
+                if any(target in media for target in target_media):
+                    event = {
+                        'summary': title,
+                        'start': {
+                            'date': formatted_date,
+                            'timeZone': 'Asia/Tokyo',
+                        },
+                        'end': {
                         'date': formatted_date,
-                        'timeZone': 'Asia/Tokyo',
-                    },
-                    'end': {
-                        'date': formatted_date,
-                        'timeZone': 'Asia/Tokyo',
-                    },
-                }
+                            'timeZone': 'Asia/Tokyo',
+                        },
+                    }
 
-                event = service.events().insert(calendarId=calendar_id, body=event).execute()
-                print(f'{title} のイベントが追加されました。')
+                    event = service.events().insert(calendarId=calendar_id, body=event).execute()
+                    print(f'{title} のイベントが追加されました。')
 
             else:
                 print(f"インデックス {i} が範囲外になったため終了します。")
@@ -169,3 +168,5 @@ for page in range(1, 5):
 
     else:
         print(f"リクエストが失敗しました。ステータスコード: {req.status_code}")
+
+send_discord_message(webhook_url, f'{year}年{month}月のライトノベルの新刊情報を取得しました。')
